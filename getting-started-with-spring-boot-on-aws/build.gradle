@@ -1,0 +1,52 @@
+plugins {
+  id 'org.springframework.boot' version '4.1.1'
+  id 'io.spring.dependency-management' version '1.1.7'
+  id 'java'
+}
+
+repositories {
+  mavenCentral()
+}
+
+ext {
+  set('awsSpringVersion', '4.0.0')
+  set('awsLambdaJavaEventsVersion', '3.14.0')
+  set('awsJavaSdkCoreVersion', '1.12.778')
+}
+
+dependencies {
+  implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+  implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+  implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
+  implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
+  implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store'
+  // AWS Java SDK v1/v2 agnostic library for type-safe access to the S3 event object
+  implementation "com.amazonaws:aws-lambda-java-events:${awsLambdaJavaEventsVersion}"
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+  testImplementation 'org.testcontainers:testcontainers-localstack'
+  testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
+  // Required to compile due to coupling between the LocalStack Testcontainers module and the AWS Java SDK v1
+  testImplementation "com.amazonaws:aws-java-sdk-core:${awsJavaSdkCoreVersion}"
+}
+
+dependencyManagement {
+  imports {
+    mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${awsSpringVersion}"
+  }
+}
+
+bootRun {
+  jvmArgs = [
+    "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005",
+    "-Daws.profile=stratospheric",
+  ]
+}
+
+tasks.named('test') {
+  useJUnitPlatform()
+}
+
+jar {
+  enabled = false
+}

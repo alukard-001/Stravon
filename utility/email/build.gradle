@@ -1,0 +1,35 @@
+plugins {
+  id 'java'
+}
+
+group 'dev.stratospheric'
+version '1.0.0'
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.current()
+  }
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.739')
+  implementation 'com.amazonaws:aws-java-sdk-s3'
+  implementation 'com.amazonaws:aws-java-sdk-ses'
+  implementation 'org.apache.commons:commons-email:1.5'
+  implementation 'com.amazonaws:aws-lambda-java-events:3.11.5'
+  implementation 'com.amazonaws:aws-lambda-java-core:1.2.3'
+  runtimeOnly 'com.amazonaws:aws-lambda-java-log4j2:1.6.0'
+  implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.5'
+}
+
+tasks.register('buildZip', Zip) {
+  from compileJava
+  from processResources
+  into('lib') {
+    from configurations.runtimeClasspath
+  }
+}
